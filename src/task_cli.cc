@@ -12,6 +12,12 @@ int main(int argc, char const *argv[])
     ErrIf(iter == support_cmd.end(), "Unsupport command: [%s].", cmd);
     // Check argc
     ErrIf(argc < iter->second, "Unexpected argument count, expected: %d, got: %d.", iter->second, argc);
-
+    // Get argv
+    std::vector<std::string> args;
+    for (int i = 2; i < argc; ++i) {
+        args.emplace_back(argv[i]);
+    }
+    TaskHandler th;
+    th.Handle(cmd, args);
     return 0;
 }

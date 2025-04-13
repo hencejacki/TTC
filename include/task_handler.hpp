@@ -13,17 +13,22 @@ public:
      * @param args
      * @return Result of handing task
      */
-    int Handle(std::string cmd, std::vector<std::string>& /*args*/);
+    int Handle(const std::string& /*cmd*/, const std::vector<std::string>& /*args*/);
 
 private:
+    
+    int handleAddTask(const std::string& /*arg*/);
 
-    int handleAddTask();
+    int handleUpdateTask(const std::vector<std::string>& /*args*/);
 
-    int handleUpdateTask();
+    int handleDeleteTask(const std::string& /*arg*/);
 
-    int handleDeleteTask();
+    int handleMarkTask(const std::string& /*arg*/, TaskStatus /*status*/);
 
-    int handleListTask();
+    int handleListTask(const std::vector<std::string>& /*args*/);
+
+private:
+    std::map<std::string, Task> task_cache_;
 };
 
 #endif // TASK_HANDLER_HPP
