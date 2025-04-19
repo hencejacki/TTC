@@ -1,5 +1,5 @@
 CC := g++
-CXXFLAGS := --std=c++11 -Wall -Iinclude -g
+CXXFLAGS := --std=c++11 -Wall -Iinclude -g -D_DEBUG
 SRC := src/task_cli.cc src/task_handler.cc
 OBJ := task_cli.o task_handler.o
 EXE := task_cli.out

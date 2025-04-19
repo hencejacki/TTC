@@ -15,7 +15,7 @@
 using SystemClock = std::chrono::system_clock;
 using SystemTimePoint = std::chrono::time_point<SystemClock>;
 
-const char* kTaskDataBaseName = "task.json";
+static const char* kTaskDataBaseName = "task.json";
 
 struct Task {
     std::string id;
@@ -43,6 +43,7 @@ static std::unordered_map<std::string, uint8_t> support_cmd = {
 
 enum class TaskStatus {
     kUnknown = -1,
+    kTodo,
     kInProgress,
     kDone
 };
@@ -54,7 +55,7 @@ static inline void ShowUsage(const std::string& prog_name) {
         << prog_name << " update [task id] [task description]\r\n"
         << prog_name << " delete [task id]\r\n"
         << prog_name << " mark-in-progress [task id]\r\n"
-        << prog_name << " mark-in-done [task id]\r\n"
+        << prog_name << " mark-done [task id]\r\n"
         << prog_name << " list [done|todo|in-progress]\r\n";
 }
 

@@ -170,12 +170,12 @@ static const char* HJson_parseArray(HJson* item, const char* value) {
         ep = value;
         return 0;
     }
+    item->type = ValueType::kArray;
     value = skip(value + 1);
     // Empty array
     if (value && *value == ']') {
         return value + 1;
     }
-    item->type = ValueType::kArray;
     item->child = child = HJson_new();
 
     value = skip(HJson_parseValue(child, skip(value)));
@@ -213,12 +213,12 @@ static const char* HJson_parseObject(HJson* item, const char* value) {
         ep = value;
         return 0;
     }
+    item->type = ValueType::kObject;
     value = skip(value + 1);
     if (value && *value == '}') {
         // Empty object
         return value + 1;
     }
-    item->type = ValueType::kObject;
     item->child = child = HJson_new();
     // Find key
     value = skip(HJson_parseString(child, skip(value)));
@@ -485,7 +485,7 @@ static bool HJson_writeValue(HJson *const node, HJson_buffer * const buf) {
     }
 }
 
-static const char* HJson_write(HJson *const node) {
+static const char* HJson_write(HJson *const node, int& length) {
     if (!node) {
         return 0;
     }
@@ -494,6 +494,7 @@ static const char* HJson_write(HJson *const node) {
     if (!inner_buffer) {
         return 0;
     }
+    memset(inner_buffer, 0, sizeof(HJson_buffer));
     if (!HJson_writeValue(node, inner_buffer)) {
         free(inner_buffer->buffer);
         free(inner_buffer);
@@ -501,17 +502,94 @@ static const char* HJson_write(HJson *const node) {
     }
     // Copy
     char* ret_buf;
-    ret_buf = (char*)malloc(inner_buffer->offset);
+    ret_buf = (char*)malloc(inner_buffer->offset + 1);
     if (!ret_buf) {
         return 0;
     }
-    memset(ret_buf, 0, inner_buffer->offset);
-    memcpy(ret_buf, inner_buffer->buffer, inner_buffer->offset);
+    length = inner_buffer->offset;
+    memset(ret_buf, 0, inner_buffer->offset + 1);
+    memcpy(ret_buf, inner_buffer->buffer, inner_buffer->offset + 1);
     free(inner_buffer->buffer);
     free(inner_buffer);
     return ret_buf;
 }
 
-static const char* HJson_error() {
-    return ep;
+static HJson* HJson_createNumber(double v) {
+    HJson* node = 0;
+    node = HJson_new();
+    if (!node) {
+        return 0;
+    }
+    node->type = ValueType::kNumber;
+    node->biv = (int)v;
+    node->dv = v;
+    return node;
+}
+
+static HJson* HJson_createBoolean(bool v) {
+    HJson* node = 0;
+    node = HJson_new();
+    if (!node) {
+        return 0;
+    }
+    node->type = v ? ValueType::kBooleanTrue : ValueType::kBooleanFalse;
+    node->biv = v ? 0 : 1;
+    return node;
+}
+
+static HJson* HJson_createString(const char* str) {
+    HJson* node = 0;
+    node = HJson_new();
+    if (!node) {
+        return 0;
+    }
+    node->type = ValueType::kString;
+    node->sv = strdup(str);
+    return node;
+}
+
+static HJson* HJson_createArray(void) {
+    HJson* node = 0;
+    node = HJson_new();
+    if (!node) {
+        return 0;
+    }
+    node->type = ValueType::kArray;
+    return node;
+}
+
+static HJson* HJson_createObject(void) {
+    HJson* node = 0;
+    node = HJson_new();
+    if (!node) {
+        return 0;
+    }
+    node->type = ValueType::kObject;
+    return node;
+}
+
+static void HJson_addItem(HJson* container, HJson* item) {
+    HJson* child = container->child;
+    if (!item) {
+        return;
+    }
+    if (!child) {
+        container->child = item;
+    } else {
+        while (child->next) {
+            child = child->next;
+        }
+        child->next = item;
+    }
+}
+
+static void HJson_addItemToObject(HJson* container, const char* key, HJson* item) {
+    if (!item) {
+        return;
+    }
+    if (item->key) {
+        free(item->key);
+    }
+    item->key = strdup(key);
+    HJson_addItem(container, item);
 }

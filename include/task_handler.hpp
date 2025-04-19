@@ -16,6 +16,10 @@ public:
     int Handle(const std::string& /*cmd*/, const std::vector<std::string>& /*args*/);
 
 private:
+
+    void init();
+
+    void flush();
     
     int handleAddTask(const std::string& /*arg*/);
 
@@ -27,8 +31,16 @@ private:
 
     int handleListTask(const std::vector<std::string>& /*args*/);
 
+    void printTask(TaskStatus /*status*/);
+
 private:
     std::map<std::string, Task> task_cache_;
+    std::vector<Task> task_all_;
+    std::vector<Task> task_todo_;
+    std::vector<Task> task_progress_;
+    std::vector<Task> task_done_;
+    int latest_id_;
+    bool updated_;
 };
 
 #endif // TASK_HANDLER_HPP
