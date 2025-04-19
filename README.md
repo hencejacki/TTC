@@ -38,4 +38,5 @@ task-cli.out list in-progress
 - [ ] Special encoding handle.
 - [ ] Pretty output.
 - [ ] Serialize formatted.
+- [ ] Output file create if not exits.
 
